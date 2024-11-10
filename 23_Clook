@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void sort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    int n, head, direction;
+
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &n);
+
+    int* requests = (int*)malloc(n * sizeof(int));
+    if (!requests) return printf("Memory allocation failed!\n"), 1;
+
+    printf("Enter the disk requests: ");
+    for (int i = 0; i < n; i++) scanf("%d", &requests[i]);
+
+    printf("Enter the initial head position: ");
+    scanf("%d", &head);
+    printf("Enter direction (1 for up, 0 for down): ");
+    scanf("%d", &direction);
+
+    sort(requests, n);
+
+    int total_seek_time = 0;
+    printf("\nDisk Scheduling Process:\n");
+
+    int start_index = (direction == 1) ? 0 : n - 1;
+    while ((direction == 1 && requests[start_index] < head) || (direction == 0 && requests[start_index] > head)) {
+        start_index += (direction == 1) ? 1 : -1;
+    }
+
+    // Process in the current direction (up or down)
+    for (int i = start_index; (direction == 1) ? i < n : i >= 0; i += (direction == 1) ? 1 : -1) {
+        int seek_time = abs(requests[i] - head);
+        total_seek_time += seek_time;
+        printf("Moved to %d, Seek time: %d\n", requests[i], seek_time);
+        head = requests[i];
+    }
+
+    // Process remaining requests in reverse direction
+    for (int i = (direction == 1) ? 0 : n - 1; (direction == 1) ? i < start_index : i > start_index; i += (direction == 1) ? 1 : -1) {
+        int seek_time = abs(requests[i] - head);
+        total_seek_time += seek_time;
+        printf("Jump to %d, Seek time: %d\n", requests[i], seek_time);
+        head = requests[i];
+    }
+
+    printf("\nTotal Seek Time: %d\n", total_seek_time);
+    free(requests);
+
+    return 0;
+}
