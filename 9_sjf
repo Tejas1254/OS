@@ -1,0 +1,76 @@
+#include <stdio.h>
+
+struct Process {
+    int pid, arrival, burst, remaining, start_time, completion, turnaround, waiting, response;
+};
+
+// Function to calculate waiting, turnaround, and response times
+void calculateTimes(struct Process proc[], int n) {
+    int total_wt = 0, total_tat = 0, total_res = 0;
+    for (int i = 0; i < n; i++) {
+        proc[i].turnaround = proc[i].completion - proc[i].arrival;
+        proc[i].waiting = proc[i].turnaround - proc[i].burst;
+        proc[i].response = proc[i].start_time - proc[i].arrival;
+        
+        total_wt += proc[i].waiting;
+        total_tat += proc[i].turnaround;
+        total_res += proc[i].response;
+    }
+    printf("\nAverage Waiting Time: %.2f", (float)total_wt / n);
+    printf("\nAverage Turnaround Time: %.2f", (float)total_tat / n);
+    printf("\nAverage Response Time: %.2f\n", (float)total_res / n);
+}
+
+// Function to implement Shortest Job First Preemptive scheduling
+void SJF_Preemptive(struct Process proc[], int n) {
+    int time = 0, completed = 0, min_index;
+    while (completed < n) {
+        min_index = -1;
+        for (int i = 0; i < n; i++) {
+            if (proc[i].arrival <= time && proc[i].remaining > 0 && (min_index == -1 || proc[i].remaining < proc[min_index].remaining)) {
+                min_index = i;
+            }
+        }
+        if (min_index == -1) { time++; continue; }
+        if (proc[min_index].remaining == proc[min_index].burst) proc[min_index].start_time = time;
+
+        proc[min_index].remaining--;
+        if (proc[min_index].remaining == 0) {
+            proc[min_index].completion = time + 1;
+            completed++;
+        }
+        time++;
+    }
+    calculateTimes(proc, n);
+}
+
+// Function to input process details
+void inputProcesses(struct Process proc[], int n) {
+    for (int i = 0; i < n; i++) {
+        printf("Enter Process %d Arrival Time and Burst Time: ", i + 1);
+        scanf("%d %d", &proc[i].arrival, &proc[i].burst);
+        proc[i].remaining = proc[i].burst;
+        proc[i].pid = i + 1;  // Assign Process ID
+    }
+}
+
+// Function to display process details
+void displayProcesses(struct Process proc[], int n) {
+    printf("\nPID\tArrival\tBurst\tCompletion\tTurnaround\tWaiting\tResponse\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\t%d\t\t%d\t\t%d\t%d\n", proc[i].pid, proc[i].arrival, proc[i].burst, proc[i].completion, proc[i].turnaround, proc[i].waiting, proc[i].response);
+    }
+}
+
+int main() {
+    int n;
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+    struct Process proc[n];
+    
+    inputProcesses(proc, n);
+    SJF_Preemptive(proc, n);
+    displayProcesses(proc, n);
+    
+    return 0;
+}
