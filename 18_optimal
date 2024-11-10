@@ -1,0 +1,47 @@
+#include <stdio.h>
+
+int main() {
+    int frames[10], pages[25], n, f, pageFaults = 0, hits = 0;
+
+    // Input length and reference string
+    printf("Enter length of reference string: ");
+    scanf("%d", &n);
+    printf("Enter the reference string: ");
+    for (int i = 0; i < n; i++) scanf("%d", &pages[i]);
+
+    // Input number of frames
+    printf("Enter number of frames: ");
+    scanf("%d", &f);
+    for (int i = 0; i < f; i++) frames[i] = -1;
+
+    // Page replacement process
+    for (int i = 0; i < n; i++) {
+        int found = 0;
+        for (int j = 0; j < f; j++) {  // Check for hit
+            if (frames[j] == pages[i]) {
+                hits++; found = 1; break;
+            }
+        }
+
+        if (!found) {  // If page fault occurs
+            int replaceIndex = pageFaults < f ? pageFaults : 0, farthest = -1;
+            if (pageFaults >= f) {
+                for (int j = 0; j < f; j++) {  // Find optimal replacement
+                    int nextUse = n;
+                    for (int k = i + 1; k < n; k++) if (frames[j] == pages[k]) { nextUse = k; break; }
+                    if (nextUse > farthest) { farthest = nextUse; replaceIndex = j; }
+                }
+            }
+            frames[replaceIndex] = pages[i];
+            pageFaults++;
+        }
+
+        // Print frame status
+        printf("Page %d: ", pages[i]);
+        for (int j = 0; j < f; j++) printf("%d ", frames[j] == -1 ? '-' : frames[j]);
+        printf(found ? "\t(Hit)\n" : "\t(PF No. %d)\n", pageFaults);
+    }
+
+    printf("\nTotal Page Faults: %d\nTotal Page Hits: %d\n", pageFaults, hits);
+    return 0;
+}
