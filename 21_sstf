@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void main() {
+    int n, head, totalSeek = 0, i, j, nearest;
+    int requests[20], visited[20] = {0}; // Track visited requests
+
+    // Input number of disk requests
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &n);
+
+    // Input disk requests
+    printf("Enter the disk requests: ");
+    for (i = 0; i < n; i++) 
+        scanf("%d", &requests[i]);
+
+    // Input initial head position
+    printf("Enter the initial head position: ");
+    scanf("%d", &head);
+
+    printf("\nDisk Scheduling Process:\n");
+
+    // SSTF Disk Scheduling Process
+    for (i = 0; i < n; i++) {
+        int minSeek = 9999; // Large number to find minimum seek time
+        nearest = -1;
+
+        // Find the nearest unvisited request to the current head position
+        for (j = 0; j < n; j++) {
+            if (!visited[j]) {
+                int seekTime = abs(head - requests[j]);
+                if (seekTime < minSeek) {
+                    minSeek = seekTime;
+                    nearest = j;
+                }
+            }
+        }
+
+        // Move head to the nearest request
+        if (nearest != -1) {
+            visited[nearest] = 1; // Mark request as visited
+            totalSeek += minSeek;
+            head = requests[nearest];
+            printf("Moved to %d, Seek time: %d\n", head, minSeek);
+        }
+    }
+
+    // Output total seek time
+    printf("\nTotal Seek Time: %d\n", totalSeek);
+}
