@@ -1,0 +1,43 @@
+#include <stdio.h>
+
+int main() {
+    int i, j, f, pf = 0, hit = 0, count = 0;
+    int rs[25], frames[10], n;
+
+    printf("Enter reference string length: ");
+    scanf("%d", &n);
+
+    printf("Enter the reference string: ");
+    for (i = 0; i < n; i++) scanf("%d", &rs[i]);
+
+    printf("Enter number of frames (min 3): ");
+    scanf("%d", &f);
+
+    for (i = 0; i < f; i++) frames[i] = -1;
+
+    printf("\nPage Replacement Process:\n");
+    for (i = 0; i < n; i++) {
+        int found = 0;
+
+        for (j = 0; j < f; j++) {
+            if (frames[j] == rs[i]) {
+                found = 1;
+                hit++;
+                break;
+            }
+        }
+
+        if (!found) {
+            frames[count] = rs[i];
+            count = (count + 1) % f;
+            pf++;
+        }
+
+        printf("Page %d: ", rs[i]);
+        for (j = 0; j < f; j++) printf("%d ", frames[j] != -1 ? frames[j] : -1);
+        printf(found ? "\t(Hit)\n" : "\t(PF No. %d)\n", pf);
+    }
+
+    printf("\nTotal Page Faults: %d\nTotal Page Hits: %d\n", pf, hit);
+    return 0;
+}
